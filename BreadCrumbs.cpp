@@ -87,11 +87,12 @@ Element::SetValue(bool value)
 	if (value == B_CONTROL_OFF)
 		return;
 	
-	std::cout << Label() << ": B_CONTROL_ON" << std::endl;
-	BView* parent = NULL;
+	BView* parent = Parent();
 	BView* child = NULL;
 	
-	if (Window() != NULL)
+	if (parent != NULL) {
+		child = parent->ChildAt(0);
+	} else if (Window() != NULL)
 		child = Window()->ChildAt(0);
 	
 	while (child != NULL) {
@@ -118,14 +119,17 @@ Element::Draw(BRect updateRect)
 {
 	BControl::Draw(updateRect);
 	
-	rgb_color highColor = HighColor();
-	rgb_color lowColor = LowColor();
+	rgb_color background = ViewColor();
+	rgb_color textColor = ui_color(B_CONTROL_TEXT_COLOR);
+	rgb_color base = LowColor();
 	BRect frame = Bounds();
-	be_control_look->DrawButtonFrame(this, frame, updateRect, highColor, lowColor);
-	be_control_look->DrawButtonBackground(this, frame, updateRect, lowColor);
-	be_control_look->DrawLabel(this, Label(), frame, updateRect, highColor,
-									BControlLook::B_IS_CONTROL,
-									BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER));
+	uint32 flags = be_control_look->Flags(this);
+	be_control_look->DrawButtonFrame(this, frame, updateRect,
+									base, background, flags);
+	be_control_look->DrawButtonBackground(this, frame, updateRect, base, flags);
+	be_control_look->DrawLabel(this, Label(), frame, updateRect, base, flags,
+									BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER),
+									&textColor);
 }
 
 
