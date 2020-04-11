@@ -15,6 +15,8 @@
 
 #include <iostream>
 
+const uint32 kMessageCode = '1234';
+
 using BPrivate::BControlLook;
 
 class Element : public BControl {
@@ -22,6 +24,7 @@ public:
 	Element(BString string);
 	virtual void SetValue(bool value);
 	
+	virtual void AttachedToWindow();
 	virtual void MouseDown(BPoint where);
 	
 	virtual void Draw(BRect rect);
@@ -36,8 +39,35 @@ BreadCrumbs::BreadCrumbs(BPath path)
 	BControl("breadcrumbs", "bre", new BMessage(), B_WILL_DRAW),
 	fPath(path)
 {
-	SetLayout(new BGroupLayout(B_HORIZONTAL, 0));
+	SetLayout(new BGroupLayout(B_HORIZONTAL, 1));
 	SetPath(path);
+}
+
+
+/* virtual */
+void
+BreadCrumbs::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case kMessageCode:
+		{
+			Element* sourceControl = NULL;
+			if (message->FindPointer("source", (void**)&sourceControl) == B_OK) {
+				fCurrentPath.Unset();
+				fCurrentPath = "/";
+				for (int32 i = 0; i < fElements.CountItems(); i++) {
+					Element* element = fElements.ItemAt(i);
+					fCurrentPath.Append(element->Label());
+					if (::strcmp(element->Label(), sourceControl->Label()) == 0)
+						break;
+				}
+			}
+			break;
+		}
+		default:
+			BControl::MessageReceived(message);
+			break;
+	}
 }
 
 
@@ -70,8 +100,16 @@ BreadCrumbs::Test()
 // Element
 Element::Element(BString string)
 	:
-	BControl(string.String(), string.String(), new BMessage(), B_WILL_DRAW)
+	BControl(string.String(), string.String(), new BMessage(kMessageCode), B_WILL_DRAW)
 {
+}
+
+
+/* virtual */
+void
+Element::AttachedToWindow()
+{
+	SetTarget(Parent(), Window());
 }
 
 
@@ -109,7 +147,10 @@ void
 Element::MouseDown(BPoint where)
 {
 	BControl::MouseDown(where);
-	SetValue(B_CONTROL_ON);
+	if (Value() != B_CONTROL_ON) {
+		SetValue(B_CONTROL_ON);
+		Invoke();
+	}
 }
 
 

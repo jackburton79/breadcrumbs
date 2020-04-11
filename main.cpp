@@ -33,7 +33,9 @@ Window::Window(BRect rect)
 	BPath path("/home/config/settings");
 	BView* view = new BreadCrumbs(path);
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.AddGlue()
 		.Add(view)
+		.AddGlue()
 		.End();
 	
 }

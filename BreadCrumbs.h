@@ -15,6 +15,8 @@ class Element;
 class BreadCrumbs : public BControl {
 public:
 	BreadCrumbs(BPath path);
+	virtual void MessageReceived(BMessage* message);
+	
 	void SetPath(BPath path);
 	void Test();
 private:
