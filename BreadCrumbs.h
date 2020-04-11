@@ -12,6 +12,7 @@
 #include <SupportDefs.h>
 
 class Element;
+class BStringView;
 class BreadCrumbs : public BControl {
 public:
 	BreadCrumbs(BPath path);
@@ -20,6 +21,7 @@ public:
 	void SetPath(BPath path);
 	void Test();
 private:
+	BStringView *fStringView;
 	BObjectList<Element> fElements;
 	BPath fPath;
 	BPath fCurrentPath;

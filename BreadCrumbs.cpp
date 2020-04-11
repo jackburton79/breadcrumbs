@@ -12,6 +12,7 @@
 #include <LayoutBuilder.h>
 #include <RadioButton.h>
 #include <String.h>
+#include <StringView.h>
 
 #include <iostream>
 
@@ -39,7 +40,8 @@ BreadCrumbs::BreadCrumbs(BPath path)
 	BControl("breadcrumbs", "bre", new BMessage(), B_WILL_DRAW),
 	fPath(path)
 {
-	SetLayout(new BGroupLayout(B_HORIZONTAL, 1));
+	BGroupLayout* layout = new BGroupLayout(B_HORIZONTAL, 1);
+	SetLayout(layout);
 	SetPath(path);
 }
 
@@ -61,6 +63,7 @@ BreadCrumbs::MessageReceived(BMessage* message)
 					if (::strcmp(element->Label(), sourceControl->Label()) == 0)
 						break;
 				}
+				fStringView->SetText(fCurrentPath.Path());
 			}
 			break;
 		}
@@ -83,17 +86,17 @@ BreadCrumbs::SetPath(BPath path)
 		fElements.AddItem(element, 0);
 		path = parent;
 	}
-	
+	BGroupView* verticalGroup = new BGroupView(B_VERTICAL);
+	BGroupView* groupView = new BGroupView(B_HORIZONTAL);
 	for (int32 i = 0; i < fElements.CountItems(); i++) {
 		Element* element = fElements.ItemAt(i);
-		GetLayout()->AddView(element);
+		groupView->GetLayout()->AddView(element);
 	}
-}
-
-
-void
-BreadCrumbs::Test()
-{
+	AddChild(verticalGroup);
+	BLayoutBuilder::Group<>(verticalGroup)
+		.Add(groupView)
+		.Add(fStringView = new BStringView("PathView", fPath.Path()))
+		.End();
 }
 
 
