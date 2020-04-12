@@ -98,10 +98,9 @@ BreadCrumbs::MessageReceived(BMessage* message)
 			BPath newPath = fTextControl->Text();
 			std::cout << newPath.Path() << std::endl;
 			if (BEntry(newPath.Path()).Exists()) {
-				std::cout << "Set initial Path" << std::endl;
 				SetInitialPath(newPath);
 			} else {
-				std::cout << "path does not exists" << std::endl;
+				fTextControl->SetText(fCurrentPath.Path());
 			}	
 			break;
 		}
@@ -118,10 +117,12 @@ BreadCrumbs::Draw(BRect updateRect)
 {
 	BControl::Draw(updateRect);
 
+	/*
 	BRect rect(Bounds());
 	rect.InsetBy(2, 2);
 	SetLowColor(ui_color(B_CONTROL_TEXT_COLOR));
 	StrokeRect(rect);
+	*/
 }
 
 
@@ -153,7 +154,7 @@ BreadCrumbs::SetInitialPath(BPath path)
 	}
 	
 	fTextControl = new BTextControl("Path:", fPath.Path(), new BMessage(kTextControlMessage));
-	
+	fTextControl->SetTarget(this, Window());
 	layout->AddView(groupView);
 	layout->AddView(fTextControl);
 }
