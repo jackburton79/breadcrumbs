@@ -12,6 +12,7 @@
 #include <GroupLayoutBuilder.h>
 #include <LayoutBuilder.h>
 #include <RadioButton.h>
+#include <SpaceLayoutItem.h>
 #include <String.h>
 #include <TextControl.h>
 
@@ -83,12 +84,13 @@ BreadCrumbs::SetInitialPath(BPath path)
 		path = parent;
 	}
 
-	BGroupView* groupView = new BGroupView(B_HORIZONTAL, -1);
+	BGroupView* groupView = new BGroupView(B_HORIZONTAL, 1);
 	for (int32 i = 0; i < fPathComponents.CountStrings(); i++) {
 		Element* element = new Element(fPathComponents.StringAt(i));
 		groupView->AddChild(element);
 		groupView->AddChild(new SeparatorElement());
 	}
+	groupView->GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
 
 	fTextControl = new BTextControl("Path:", fPath.Path(), new BMessage(kTextControlMessage));
 	fTextControl->SetTarget(this, Window());
@@ -103,6 +105,7 @@ BreadCrumbs::AllAttached()
 {
 	BControl::AllAttached();
 	fTextControl->SetTarget(this, Window());
+	Relayout();
 }
 
 

@@ -11,7 +11,6 @@
 #include <SupportDefs.h>
 #include <StringList.h>
 
-class Element;
 class BTextControl;
 class BreadCrumbs : public BControl {
 public:
