@@ -13,10 +13,12 @@
 #include <RadioButton.h>
 #include <String.h>
 #include <StringView.h>
+#include <TextControl.h>
 
 #include <iostream>
 
 const uint32 kMessageCode = '1234';
+const uint32 kTextControlMessage = '9999';
 
 using BPrivate::BControlLook;
 
@@ -35,14 +37,38 @@ public:
 };
 
 
+class SeparatorElement : public Element {
+public:
+	SeparatorElement();
+	virtual void SetValue(bool value);
+	
+	virtual void AttachedToWindow();
+	virtual void MouseDown(BPoint where);
+	
+	virtual void Draw(BRect rect);
+	
+	virtual BSize MinSize();
+	virtual BSize MaxSize();
+};
+
+
 BreadCrumbs::BreadCrumbs(BPath path)
 	:
-	BControl("breadcrumbs", "bre", new BMessage(), B_WILL_DRAW),
+	BControl("breadcrumbs", "breadcrumbs", new BMessage(), B_WILL_DRAW),
 	fPath(path)
 {
-	BGroupLayout* layout = new BGroupLayout(B_HORIZONTAL, 1);
+	BGroupLayout* layout = new BGroupLayout(B_VERTICAL);
 	SetLayout(layout);
-	SetPath(path);
+	SetInitialPath(path);
+}
+
+
+/* virtual */
+void
+BreadCrumbs::AllAttached()
+{
+	BControl::AllAttached();
+	fTextControl->SetTarget(this, Window());
 }
 
 
@@ -64,7 +90,14 @@ BreadCrumbs::MessageReceived(BMessage* message)
 						break;
 				}
 				fStringView->SetText(fCurrentPath.Path());
+				fTextControl->SetText(fCurrentPath.Path());
 			}
+			break;
+		}
+		case kTextControlMessage:
+		{
+			message->PrintToStream();
+		
 			break;
 		}
 		default:
@@ -74,8 +107,21 @@ BreadCrumbs::MessageReceived(BMessage* message)
 }
 
 
+/* virtual */
 void
-BreadCrumbs::SetPath(BPath path)
+BreadCrumbs::Draw(BRect updateRect)
+{
+	BControl::Draw(updateRect);
+	
+	BRect rect(Bounds());
+	rect.InsetBy(2, 2);
+	SetLowColor(ui_color(B_CONTROL_TEXT_COLOR));
+	StrokeRect(rect);
+}
+
+
+void
+BreadCrumbs::SetInitialPath(BPath path)
 {
 	fElements.MakeEmpty();
 	fPath = fCurrentPath = path;
@@ -86,17 +132,22 @@ BreadCrumbs::SetPath(BPath path)
 		fElements.AddItem(element, 0);
 		path = parent;
 	}
-	BGroupView* verticalGroup = new BGroupView(B_VERTICAL);
-	BGroupView* groupView = new BGroupView(B_HORIZONTAL);
+	
+	BGroupView* groupView = new BGroupView(B_HORIZONTAL, -1);
 	for (int32 i = 0; i < fElements.CountItems(); i++) {
 		Element* element = fElements.ItemAt(i);
-		groupView->GetLayout()->AddView(element);
+		groupView->AddChild(element);
+		groupView->AddChild(new SeparatorElement());
 	}
-	AddChild(verticalGroup);
-	BLayoutBuilder::Group<>(verticalGroup)
-		.Add(groupView)
-		.Add(fStringView = new BStringView("PathView", fPath.Path()))
-		.End();
+	
+	fStringView = new BStringView("PathView", fPath.Path());
+	fTextControl = new BTextControl("TextControl", fPath.Path(), new BMessage(kTextControlMessage));
+	
+	GetLayout()->AddView(groupView);
+	GetLayout()->AddView(fTextControl);
+	GetLayout()->AddView(fStringView);
+	
+	//fTextControl->SetTarget(this, Window());
 }
 
 
@@ -194,5 +245,77 @@ Element::MaxSize()
 	const float kPadding = 20;
 	float width = StringWidth(Label()) + kPadding;
 	float height = 30;
+	return BSize(width, height);
+}
+
+
+// SeparatorElement
+SeparatorElement::SeparatorElement()
+	:
+	Element("")
+{
+}
+
+
+/* virtual */
+void
+SeparatorElement::AttachedToWindow()
+{
+	BControl::AttachedToWindow();
+}
+
+
+/* virtual */
+void
+SeparatorElement::SetValue(bool value)
+{
+}
+
+
+/* virtual */
+void
+SeparatorElement::MouseDown(BPoint where)
+{
+	BControl::MouseDown(where);
+}
+
+
+/* virtual */
+void
+SeparatorElement::Draw(BRect updateRect)
+{
+	BControl::Draw(updateRect);
+	
+	rgb_color background = ViewColor();
+	rgb_color textColor = ui_color(B_CONTROL_TEXT_COLOR);
+	rgb_color base = LowColor();
+	BRect frame = Bounds();
+	uint32 flags = be_control_look->Flags(this);
+	be_control_look->DrawButtonFrame(this, frame, updateRect,
+									base, background, flags);
+	be_control_look->DrawButtonBackground(this, frame, updateRect, base, flags);
+	be_control_look->DrawLabel(this, "/", frame, updateRect, base, flags,
+									BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER),
+									&textColor);
+}
+
+
+/* virtual */
+BSize
+SeparatorElement::MinSize()
+{
+	float width = 20;
+	float height = 20;
+	return BSize(width, height);
+}
+
+
+/* virtual */
+BSize
+SeparatorElement::MaxSize()
+{
+	const float kPadding = 20;
+	float width = 20;
+	float height = 20;
 	return BSize(width, height);
 }
