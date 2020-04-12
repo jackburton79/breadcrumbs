@@ -30,7 +30,7 @@ Window::Window(BRect rect)
 	:
 	BWindow(rect, "window", B_TITLED_WINDOW, B_QUIT_ON_WINDOW_CLOSE|B_SUPPORTS_LAYOUT)
 {
-	BPath path("/home/config/settings");
+	BPath path("/boot/home/config/settings");
 	BView* view = new BreadCrumbs(path);
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.AddGlue()
