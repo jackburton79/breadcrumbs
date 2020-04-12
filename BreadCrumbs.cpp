@@ -63,6 +63,40 @@ BreadCrumbs::BreadCrumbs(BPath path)
 }
 
 
+void
+BreadCrumbs::SetInitialPath(BPath path)
+{
+	fPath = fCurrentPath = path;
+
+	BLayout* layout = GetLayout();
+
+	if (fPathComponents.CountStrings() > 0) {
+		fPathComponents.MakeEmpty();
+		layout->RemoveView(ChildAt(0));
+		layout->RemoveView(fTextControl);
+	}
+
+	BPath parent;
+	while (path.GetParent(&parent) == B_OK) {
+		BString pathComponent = path.Leaf();
+		fPathComponents.Add(pathComponent, 0);
+		path = parent;
+	}
+
+	BGroupView* groupView = new BGroupView(B_HORIZONTAL, -1);
+	for (int32 i = 0; i < fPathComponents.CountStrings(); i++) {
+		Element* element = new Element(fPathComponents.StringAt(i));
+		groupView->AddChild(element);
+		groupView->AddChild(new SeparatorElement());
+	}
+
+	fTextControl = new BTextControl("Path:", fPath.Path(), new BMessage(kTextControlMessage));
+	fTextControl->SetTarget(this, Window());
+	layout->AddView(groupView);
+	layout->AddView(fTextControl);
+}
+
+
 /* virtual */
 void
 BreadCrumbs::AllAttached()
@@ -159,40 +193,6 @@ BSize
 BreadCrumbs::PreferredSize()
 {
 	return MinSize();
-}
-
-
-void
-BreadCrumbs::SetInitialPath(BPath path)
-{
-	fPath = fCurrentPath = path;
-
-	BLayout* layout = GetLayout();
-
-	if (fPathComponents.CountStrings() > 0) {
-		fPathComponents.MakeEmpty();
-		layout->RemoveView(ChildAt(0));
-		layout->RemoveView(fTextControl);
-	}
-
-	BPath parent;
-	while (path.GetParent(&parent) == B_OK) {
-		BString pathComponent = path.Leaf();
-		fPathComponents.Add(pathComponent, 0);
-		path = parent;
-	}
-	
-	BGroupView* groupView = new BGroupView(B_HORIZONTAL, -1);
-	for (int32 i = 0; i < fPathComponents.CountStrings(); i++) {
-		Element* element = new Element(fPathComponents.StringAt(i));
-		groupView->AddChild(element);
-		groupView->AddChild(new SeparatorElement());
-	}
-	
-	fTextControl = new BTextControl("Path:", fPath.Path(), new BMessage(kTextControlMessage));
-	fTextControl->SetTarget(this, Window());
-	layout->AddView(groupView);
-	layout->AddView(fTextControl);
 }
 
 
