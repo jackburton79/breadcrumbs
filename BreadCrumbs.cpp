@@ -280,9 +280,7 @@ Element::Draw(BRect updateRect)
 BSize
 Element::MinSize()
 {
-	float width = StringWidth(Label());
-	float height = 30;
-	return BSize(width, height);
+	return MaxSize();
 }
 
 
