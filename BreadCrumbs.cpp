@@ -8,11 +8,11 @@
 
 #include <Button.h>
 #include <ControlLook.h>
+#include <Entry.h>
 #include <GroupLayoutBuilder.h>
 #include <LayoutBuilder.h>
 #include <RadioButton.h>
 #include <String.h>
-#include <StringView.h>
 #include <TextControl.h>
 
 #include <iostream>
@@ -89,15 +89,20 @@ BreadCrumbs::MessageReceived(BMessage* message)
 					if (::strcmp(element->Label(), sourceControl->Label()) == 0)
 						break;
 				}
-				fStringView->SetText(fCurrentPath.Path());
 				fTextControl->SetText(fCurrentPath.Path());
 			}
 			break;
 		}
 		case kTextControlMessage:
 		{
-			message->PrintToStream();
-		
+			BPath newPath = fTextControl->Text();
+			std::cout << newPath.Path() << std::endl;
+			if (BEntry(newPath.Path()).Exists()) {
+				std::cout << "Set initial Path" << std::endl;
+				SetInitialPath(newPath);
+			} else {
+				std::cout << "path does not exists" << std::endl;
+			}	
 			break;
 		}
 		default:
@@ -112,7 +117,7 @@ void
 BreadCrumbs::Draw(BRect updateRect)
 {
 	BControl::Draw(updateRect);
-	
+
 	BRect rect(Bounds());
 	rect.InsetBy(2, 2);
 	SetLowColor(ui_color(B_CONTROL_TEXT_COLOR));
@@ -123,9 +128,16 @@ BreadCrumbs::Draw(BRect updateRect)
 void
 BreadCrumbs::SetInitialPath(BPath path)
 {
-	fElements.MakeEmpty();
 	fPath = fCurrentPath = path;
+
+	BLayout* layout = GetLayout();
 	
+	if (fElements.CountItems() > 0) {
+		fElements.MakeEmpty();
+		layout->RemoveView(ChildAt(0));
+		layout->RemoveView(fTextControl);
+	}
+
 	BPath parent;
 	while (path.GetParent(&parent) == B_OK) {
 		Element* element = new Element(path.Leaf());
@@ -140,14 +152,10 @@ BreadCrumbs::SetInitialPath(BPath path)
 		groupView->AddChild(new SeparatorElement());
 	}
 	
-	fStringView = new BStringView("PathView", fPath.Path());
-	fTextControl = new BTextControl("TextControl", fPath.Path(), new BMessage(kTextControlMessage));
+	fTextControl = new BTextControl("Path:", fPath.Path(), new BMessage(kTextControlMessage));
 	
-	GetLayout()->AddView(groupView);
-	GetLayout()->AddView(fTextControl);
-	GetLayout()->AddView(fStringView);
-	
-	//fTextControl->SetTarget(this, Window());
+	layout->AddView(groupView);
+	layout->AddView(fTextControl);
 }
 
 
