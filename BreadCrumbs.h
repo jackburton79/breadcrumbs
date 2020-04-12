@@ -20,6 +20,10 @@ public:
 	virtual void AllAttached();
 	virtual void MessageReceived(BMessage* message);
 	virtual void Draw(BRect updateRect);
+
+	virtual BSize MinSize();
+	virtual BSize MaxSize();
+	virtual BSize PreferredSize();
 	
 	void SetInitialPath(BPath path);
 	void Test();

@@ -96,7 +96,6 @@ BreadCrumbs::MessageReceived(BMessage* message)
 		case kTextControlMessage:
 		{
 			BPath newPath = fTextControl->Text();
-			std::cout << newPath.Path() << std::endl;
 			if (BEntry(newPath.Path()).Exists()) {
 				SetInitialPath(newPath);
 			} else {
@@ -123,6 +122,43 @@ BreadCrumbs::Draw(BRect updateRect)
 	SetLowColor(ui_color(B_CONTROL_TEXT_COLOR));
 	StrokeRect(rect);
 	*/
+}
+
+
+/* virtual */
+BSize
+BreadCrumbs::MinSize()
+{
+	return MaxSize();
+}
+
+
+/* virtual */
+BSize
+BreadCrumbs::MaxSize()
+{
+	float maxWidth = 0;
+	float maxHeight = 0;
+	BLayout* layout = GetLayout();
+	for (int32 i = 0; i < layout->CountItems(); i++) {
+		BLayoutItem* item = layout->ItemAt(i);
+		if (dynamic_cast<Element*>(item) != NULL) {
+			BSize maxSize = item->MaxSize();
+			maxWidth += maxSize.width;
+			maxHeight = std::max(maxHeight, maxSize.height); 
+		}
+	}
+	
+	std::cout << maxWidth << ", " << maxHeight << std::endl;
+	return BSize(maxWidth, maxHeight);
+}
+
+
+/* virtual */
+BSize
+BreadCrumbs::PreferredSize()
+{
+	return MinSize();
 }
 
 
