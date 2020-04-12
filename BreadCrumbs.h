@@ -7,16 +7,17 @@
 
 
 #include <Control.h>
-#include <ObjectList.h>
 #include <Path.h>
 #include <SupportDefs.h>
+#include <StringList.h>
 
 class Element;
-class BStringView;
 class BTextControl;
 class BreadCrumbs : public BControl {
 public:
 	BreadCrumbs(BPath path);
+	void SetInitialPath(BPath path);
+
 	virtual void AllAttached();
 	virtual void MessageReceived(BMessage* message);
 	virtual void Draw(BRect updateRect);
@@ -24,13 +25,9 @@ public:
 	virtual BSize MinSize();
 	virtual BSize MaxSize();
 	virtual BSize PreferredSize();
-	
-	void SetInitialPath(BPath path);
-	void Test();
 private:
-	BStringView *fStringView;
 	BTextControl* fTextControl;
-	BObjectList<Element> fElements;
+	BStringList fPathComponents;
 	BPath fPath;
 	BPath fCurrentPath;
 };
