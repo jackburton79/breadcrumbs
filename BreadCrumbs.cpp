@@ -55,10 +55,10 @@ public:
 
 BreadCrumbs::BreadCrumbs(BPath path)
 	:
-	BControl("breadcrumbs", "breadcrumbs", new BMessage(), B_WILL_DRAW),
+	BView("breadcrumbs", B_WILL_DRAW),
 	fPath(path)
 {
-	BGroupLayout* layout = new BGroupLayout(B_VERTICAL);
+	BCardLayout* layout = new BCardLayout();
 	SetLayout(layout);
 	SetInitialPath(path);
 }
@@ -71,19 +71,20 @@ BreadCrumbs::SetInitialPath(BPath path)
 
 	BLayout* layout = GetLayout();
 
+	// Remove existing views
 	if (fPathComponents.CountStrings() > 0) {
 		fPathComponents.MakeEmpty();
 		layout->RemoveView(ChildAt(0));
 		layout->RemoveView(fTextControl);
 	}
 
+	// Split path and create elements
 	BPath parent;
 	while (path.GetParent(&parent) == B_OK) {
 		BString pathComponent = path.Leaf();
 		fPathComponents.Add(pathComponent, 0);
 		path = parent;
 	}
-
 	BGroupView* groupView = new BGroupView(B_HORIZONTAL, 1);
 	for (int32 i = 0; i < fPathComponents.CountStrings(); i++) {
 		Element* element = new Element(fPathComponents.StringAt(i));
@@ -92,10 +93,24 @@ BreadCrumbs::SetInitialPath(BPath path)
 	}
 	groupView->GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
 
-	fTextControl = new BTextControl("Path:", fPath.Path(), new BMessage(kTextControlMessage));
+	fTextControl = new BTextControl("", fPath.Path(), new BMessage(kTextControlMessage));
 	fTextControl->SetTarget(this, Window());
+
 	layout->AddView(groupView);
 	layout->AddView(fTextControl);
+	
+	((BCardLayout*)layout)->SetVisibleItem(0);
+}
+
+
+void
+BreadCrumbs::Toggle()
+{
+	BCardLayout* layout = (BCardLayout*)GetLayout();
+	if (layout->VisibleIndex() == 0)
+		layout->SetVisibleItem(1);
+	else
+		layout->SetVisibleItem(0);
 }
 
 
@@ -103,9 +118,8 @@ BreadCrumbs::SetInitialPath(BPath path)
 void
 BreadCrumbs::AllAttached()
 {
-	BControl::AllAttached();
+	BView::AllAttached();
 	fTextControl->SetTarget(this, Window());
-	Relayout();
 }
 
 
@@ -140,8 +154,13 @@ BreadCrumbs::MessageReceived(BMessage* message)
 			}	
 			break;
 		}
+		case 'TOGL':
+		{
+			Toggle();
+			break;
+		}
 		default:
-			BControl::MessageReceived(message);
+			BView::MessageReceived(message);
 			break;
 	}
 }
@@ -151,7 +170,7 @@ BreadCrumbs::MessageReceived(BMessage* message)
 void
 BreadCrumbs::Draw(BRect updateRect)
 {
-	BControl::Draw(updateRect);
+	BView::Draw(updateRect);
 
 	/*
 	BRect rect(Bounds());
@@ -181,12 +200,11 @@ BreadCrumbs::MaxSize()
 		BLayoutItem* item = layout->ItemAt(i);
 		if (dynamic_cast<Element*>(item) != NULL) {
 			BSize maxSize = item->MaxSize();
-			maxWidth += maxSize.width;
+			maxWidth += maxSize.width + 20;
 			maxHeight = std::max(maxHeight, maxSize.height); 
 		}
 	}
 	
-	std::cout << maxWidth << ", " << maxHeight << std::endl;
 	return BSize(maxWidth, maxHeight);
 }
 
@@ -298,7 +316,7 @@ Element::MaxSize()
 // SeparatorElement
 SeparatorElement::SeparatorElement()
 	:
-	Element("")
+	Element("/")
 {
 }
 
@@ -340,7 +358,7 @@ SeparatorElement::Draw(BRect updateRect)
 	be_control_look->DrawButtonFrame(this, frame, updateRect,
 									base, background, flags);
 	be_control_look->DrawButtonBackground(this, frame, updateRect, base, flags);
-	be_control_look->DrawLabel(this, "/", frame, updateRect, base, flags,
+	be_control_look->DrawLabel(this, Label(), frame, updateRect, base, flags,
 									BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER),
 									&textColor);
 }

@@ -12,11 +12,12 @@
 #include <StringList.h>
 
 class BTextControl;
-class BreadCrumbs : public BControl {
+class BreadCrumbs : public BView {
 public:
 	BreadCrumbs(BPath path);
 	void SetInitialPath(BPath path);
-
+	void Toggle();
+	
 	virtual void AllAttached();
 	virtual void MessageReceived(BMessage* message);
 	virtual void Draw(BRect updateRect);
