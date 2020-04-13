@@ -32,11 +32,18 @@ public:
 
 	virtual void AttachedToWindow();
 	virtual void MouseDown(BPoint where);
-
+	virtual void MouseMoved(BPoint where, uint32 code,
+									const BMessage* dragMessage);
 	virtual void Draw(BRect rect);
 
 	virtual BSize MinSize();
 	virtual BSize MaxSize();
+
+	void SetHovering(bool hover) { fHovering = hover; };
+	bool IsHovering() const { return fHovering; };
+private:
+	bool fHovering;
+	uint8 fHoveringLevel;
 };
 
 
@@ -113,7 +120,7 @@ BreadCrumbs2::SetInitialPath(BPath path)
 		groupView->AddChild(new SeparatorElement());
 	}
 	groupView->GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
-	//((BCardLayout*)layout)->SetInsets(4, 4, 4, 4);
+	//groupView->SetInsets(4, 4, 4, 4);
 	fTextControl = new BTextControl("", fPath.Path(), new BMessage(kTextControlMessage));
 	fTextControl->SetTarget(this, Window());
 
@@ -209,7 +216,7 @@ BreadCrumbs2::MouseDown(BPoint where)
 	
 }
 
-
+		
 /* virtual */
 BSize
 BreadCrumbs2::MinSize()
@@ -283,6 +290,8 @@ Element::Element(BString string)
 	:
 	BControl(string.String(), string.String(), new BMessage(kMessageCode), B_WILL_DRAW)
 {
+	SetHovering(false);
+	fHoveringLevel = 0;
 }
 
 
@@ -337,6 +346,26 @@ Element::MouseDown(BPoint where)
 
 /* virtual */
 void
+Element::MouseMoved(BPoint where, uint32 code,
+									const BMessage* dragMessage)
+{
+	switch (code) {
+		case B_ENTERED_VIEW:
+			SetHovering(true);
+			Invalidate();
+			break;
+		case B_EXITED_VIEW:
+			SetHovering(false);
+			Invalidate();
+			break;
+		default:
+			break;
+	}
+}
+
+
+/* virtual */
+void
 Element::Draw(BRect updateRect)
 {
 	BControl::Draw(updateRect);
@@ -346,9 +375,9 @@ Element::Draw(BRect updateRect)
 	rgb_color base = LowColor();
 	BRect frame = Bounds().InsetByCopy(-1, 0);
 	uint32 flags = be_control_look->Flags(this);
-	//be_control_look->DrawButtonFrame(this, frame, updateRect,
-	//								base, background, flags);
-	//be_control_look->DrawButtonBackground(this, frame, updateRect, base, flags);
+	if (IsHovering()) {
+		be_control_look->DrawButtonFrame(this, frame, updateRect, base, background, flags);
+	}
 	be_control_look->DrawLabel(this, Label(), frame, updateRect, base, flags,
 									BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER),
 									&textColor);
@@ -367,7 +396,7 @@ Element::MinSize()
 BSize
 Element::MaxSize()
 {
-	const float kPadding = 15;
+	const float kPadding = 5;
 	float width = StringWidth(Label()) + kPadding;
 	float height = 25;
 	return BSize(width, height);
@@ -426,7 +455,7 @@ SeparatorElement::Draw(BRect updateRect)
 BSize
 SeparatorElement::MinSize()
 {
-	float width = 20;
+	float width = 10;
 	float height = 20;
 	return BSize(width, height);
 }
@@ -436,7 +465,7 @@ SeparatorElement::MinSize()
 BSize
 SeparatorElement::MaxSize()
 {
-	float width = 20;
+	float width = 10;
 	float height = 20;
 	return BSize(width, height);
 }
