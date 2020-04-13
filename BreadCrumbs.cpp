@@ -56,10 +56,12 @@ public:
 BreadCrumbs::BreadCrumbs(BPath path)
 	:
 	BView("breadcrumbs", B_WILL_DRAW),
-	fPath(path)
+	fTextControl(NULL),
+	fPath(path),
+	fCurrentPath(path)
 {
-	BCardLayout* layout = new BCardLayout();
-	SetLayout(layout);
+	SetLayout(new BCardLayout());
+
 	SetInitialPath(path);
 }
 
