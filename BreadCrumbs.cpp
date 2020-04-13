@@ -27,6 +27,21 @@ class Element : public BControl {
 public:
 	Element(BString string);
 	virtual void SetValue(bool value);
+
+	virtual void AttachedToWindow();
+	virtual void MouseDown(BPoint where);
+
+	virtual void Draw(BRect rect);
+
+	virtual BSize MinSize();
+	virtual BSize MaxSize();
+};
+
+
+class SeparatorElement : public Element {
+public:
+	SeparatorElement();
+	virtual void SetValue(bool value);
 	
 	virtual void AttachedToWindow();
 	virtual void MouseDown(BPoint where);
@@ -38,9 +53,9 @@ public:
 };
 
 
-class SeparatorElement : public Element {
+class RootElement : public Element {
 public:
-	SeparatorElement();
+	RootElement();
 	virtual void SetValue(bool value);
 	
 	virtual void AttachedToWindow();
@@ -88,6 +103,7 @@ BreadCrumbs::SetInitialPath(BPath path)
 		path = parent;
 	}
 	BGroupView* groupView = new BGroupView(B_HORIZONTAL, 0);
+	//groupView->AddChild(new RootElement());
 	for (int32 i = 0; i < fPathComponents.CountStrings(); i++) {
 		Element* element = new Element(fPathComponents.StringAt(i));
 		groupView->AddChild(element);
@@ -378,6 +394,78 @@ SeparatorElement::MinSize()
 /* virtual */
 BSize
 SeparatorElement::MaxSize()
+{
+	const float kPadding = 20;
+	float width = 20;
+	float height = 20;
+	return BSize(width, height);
+}
+
+
+// RootElement
+RootElement::RootElement()
+	:
+	Element("/")
+{
+}
+
+
+/* virtual */
+void
+RootElement::AttachedToWindow()
+{
+	BControl::AttachedToWindow();
+}
+
+
+/* virtual */
+void
+RootElement::SetValue(bool value)
+{
+}
+
+
+/* virtual */
+void
+RootElement::MouseDown(BPoint where)
+{
+	BControl::MouseDown(where);
+}
+
+
+/* virtual */
+void
+RootElement::Draw(BRect updateRect)
+{
+	BControl::Draw(updateRect);
+
+	rgb_color background = ViewColor();
+	rgb_color textColor = ui_color(B_CONTROL_TEXT_COLOR);
+	rgb_color base = LowColor();
+	BRect frame = Bounds();
+	uint32 flags = be_control_look->Flags(this);
+	be_control_look->DrawButtonFrame(this, frame, updateRect,
+									base, background, flags);
+	be_control_look->DrawButtonBackground(this, frame, updateRect, base, flags);
+	be_control_look->DrawLabel(this, Label(), frame, updateRect, base, flags,
+									BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER),
+									&textColor);
+}
+
+
+/* virtual */
+BSize
+RootElement::MinSize()
+{
+	float width = 20;
+	float height = 20;
+	return BSize(width, height);
+}
+
+
+/* virtual */
+BSize
+RootElement::MaxSize()
 {
 	const float kPadding = 20;
 	float width = 20;

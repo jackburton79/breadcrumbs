@@ -37,12 +37,9 @@ Window::Window(BRect rect)
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.AddGlue()
 		.AddGroup(B_HORIZONTAL)
-			.AddGlue()
+			.Add(view)
 			.Add(button)
-			.AddGlue()
 		.End()
-		.AddGlue()
-		.Add(view)
 		.AddGlue()
 	.End();
 	
