@@ -85,20 +85,21 @@ BreadCrumbs::SetInitialPath(BPath path)
 		fPathComponents.Add(pathComponent, 0);
 		path = parent;
 	}
-	BGroupView* groupView = new BGroupView(B_HORIZONTAL, 1);
+	BGroupView* groupView = new BGroupView(B_HORIZONTAL, 0);
 	for (int32 i = 0; i < fPathComponents.CountStrings(); i++) {
 		Element* element = new Element(fPathComponents.StringAt(i));
 		groupView->AddChild(element);
-		groupView->AddChild(new SeparatorElement());
+		//groupView->AddChild(new SeparatorElement());
 	}
 	groupView->GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
+	//groupView->GroupLayout()->SetInsets(0, 0, 0, 0);
 
 	fTextControl = new BTextControl("", fPath.Path(), new BMessage(kTextControlMessage));
 	fTextControl->SetTarget(this, Window());
 
 	layout->AddView(groupView);
 	layout->AddView(fTextControl);
-	
+
 	((BCardLayout*)layout)->SetVisibleItem(0);
 }
 
@@ -172,12 +173,10 @@ BreadCrumbs::Draw(BRect updateRect)
 {
 	BView::Draw(updateRect);
 
-	/*
 	BRect rect(Bounds());
-	rect.InsetBy(2, 2);
+	//rect.InsetBy(2, 2);
 	SetLowColor(ui_color(B_CONTROL_TEXT_COLOR));
 	StrokeRect(rect);
-	*/
 }
 
 
@@ -283,7 +282,7 @@ Element::Draw(BRect updateRect)
 	rgb_color background = ViewColor();
 	rgb_color textColor = ui_color(B_CONTROL_TEXT_COLOR);
 	rgb_color base = LowColor();
-	BRect frame = Bounds();
+	BRect frame = Bounds().InsetByCopy(-1, 0);
 	uint32 flags = be_control_look->Flags(this);
 	be_control_look->DrawButtonFrame(this, frame, updateRect,
 									base, background, flags);
@@ -306,9 +305,9 @@ Element::MinSize()
 BSize
 Element::MaxSize()
 {
-	const float kPadding = 20;
+	const float kPadding = 15;
 	float width = StringWidth(Label()) + kPadding;
-	float height = 30;
+	float height = 25;
 	return BSize(width, height);
 }
 
