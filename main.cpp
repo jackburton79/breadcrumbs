@@ -5,6 +5,7 @@
 
 
 #include "BreadCrumbs.h"
+#include "BreadCrumbs2.h"
 
 #include <Application.h>
 #include <Button.h>
@@ -33,16 +34,23 @@ Window::Window(BRect rect)
 {
 	BPath path("/boot/home/config/settings");
 	BView* view = new BreadCrumbs(path);
+	BView* view2 = new BreadCrumbs2(path);
 	BButton* button = new BButton("Toggle", new BMessage('TOGL'));
+	BButton* button2 = new BButton("Toggle", new BMessage('TOGL'));
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.AddGlue()
 		.AddGroup(B_HORIZONTAL)
 			.Add(view)
 			.Add(button)
 		.End()
+		.AddGroup(B_HORIZONTAL)
+			.Add(view2)
+			.Add(button2)
+		.End()
 		.AddGlue()
 	.End();
 	
 	button->SetTarget(view);
+	button2->SetTarget(view2);
 }
 
