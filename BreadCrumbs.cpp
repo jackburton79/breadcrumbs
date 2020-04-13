@@ -103,14 +103,13 @@ BreadCrumbs::SetInitialPath(BPath path)
 		path = parent;
 	}
 	BGroupView* groupView = new BGroupView(B_HORIZONTAL, 0);
-	//groupView->AddChild(new RootElement());
+	groupView->AddChild(new RootElement());
 	for (int32 i = 0; i < fPathComponents.CountStrings(); i++) {
 		Element* element = new Element(fPathComponents.StringAt(i));
 		groupView->AddChild(element);
 		//groupView->AddChild(new SeparatorElement());
 	}
 	groupView->GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
-	//groupView->GroupLayout()->SetInsets(0, 0, 0, 0);
 
 	fTextControl = new BTextControl("", fPath.Path(), new BMessage(kTextControlMessage));
 	fTextControl->SetTarget(this, Window());
