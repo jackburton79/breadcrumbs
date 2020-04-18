@@ -86,6 +86,7 @@ public:
 class TextControl : public BTextControl {
 public:
 	TextControl(const char* name, const char* label, BMessage* message);
+	virtual void KeyDown(const char* bytes, int32 numBytes);
 	virtual void MakeFocus(bool focus);
 };
 
@@ -601,4 +602,20 @@ void
 TextControl::MakeFocus(bool focus)
 {
 	BTextControl::MakeFocus(false);
+}
+
+
+/* virtual */
+void
+TextControl::KeyDown(const char* bytes, int32 numBytes)
+{
+	switch (bytes[0]) {
+		case B_ESCAPE:
+		{
+			break;
+		}
+		default:
+			BTextControl::KeyDown(bytes, numBytes);
+			break;
+	}
 }

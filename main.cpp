@@ -8,6 +8,7 @@
 #include "BreadCrumbs2.h"
 
 #include <Application.h>
+#include <Box.h>
 #include <Button.h>
 #include <GroupLayoutBuilder.h>
 #include <LayoutBuilder.h>
@@ -33,24 +34,15 @@ Window::Window(BRect rect)
 	BWindow(rect, "window", B_TITLED_WINDOW, B_QUIT_ON_WINDOW_CLOSE|B_SUPPORTS_LAYOUT)
 {
 	BPath path("/boot/home/config/settings");
-	BView* view = new BreadCrumbs(path);
+	BBox* box = new BBox("Breadcrumbs");
 	BView* view2 = new BreadCrumbs2(path);
-	BButton* button = new BButton("Toggle", new BMessage('TOGL'));
-	BButton* button2 = new BButton("Toggle", new BMessage('TOGL'));
+	box->AddChild(view2);
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.AddGlue()
-		/*.AddGroup(B_HORIZONTAL)
-			.Add(view)
-			.Add(button)
-		.End()*/
 		.AddGroup(B_HORIZONTAL)
-			.Add(view2)
-			.Add(button2)
+			.Add(box)
 		.End()
 		.AddGlue()
 	.End();
-	
-	//button->SetTarget(view);
-	button2->SetTarget(view2);
 }
 
