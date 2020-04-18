@@ -56,9 +56,6 @@ public:
 	virtual void MouseDown(BPoint where);
 	
 	virtual void Draw(BRect rect);
-	
-	virtual BSize MinSize();
-	virtual BSize MaxSize();
 };
 
 
@@ -129,12 +126,12 @@ BreadCrumbs2::SetInitialPath(BPath path)
 	
 	BGroupView* groupView = new ContainerView();
 	for (int32 i = 0; i < fPathComponents.CountStrings(); i++) {
+		groupView->AddChild(new SeparatorElement());
 		Element* element = new Element(fPathComponents.StringAt(i));
 		groupView->AddChild(element);
-		groupView->AddChild(new SeparatorElement());
 	}
 	groupView->GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
-	//groupView->SetInsets(4, 4, 4, 4);
+
 	fTextControl = new TextControl("", fPath.Path(), new BMessage(kTextControlMessage));
 	fTextControl->SetTarget(this, Window());
 
@@ -228,7 +225,6 @@ void
 BreadCrumbs2::MouseDown(BPoint where)
 {
 	BControl::MouseDown(where);
-	
 }
 
 		
@@ -282,21 +278,6 @@ BreadCrumbs2::_DrawBackground(BRect updateRect)
 void
 BreadCrumbs2::_DrawText(BRect updateRect)
 {
-	/*BRect bounds(Bounds());
-	BPoint location = bounds.LeftTop();	
-	font_height fontHeight;
-	GetFontHeight(&fontHeight);
-	location.y += (fontHeight.ascent + fontHeight.descent);
-	
-	MovePenTo(location);
-	SetLowColor(ui_color(B_CONTROL_TEXT_COLOR));
-	
-	for (int32 i = 0; i < fPathComponents.CountStrings(); i++) {
-		DrawString(fPathComponents.StringAt(i).String());
-		MovePenBy(5, 0);
-		DrawString(">");
-		MovePenBy(5, 0);
-	}*/
 }
 
 
@@ -440,6 +421,7 @@ SeparatorElement::AttachedToWindow()
 void
 SeparatorElement::SetValue(bool value)
 {
+	// Empty
 }
 
 
@@ -465,26 +447,6 @@ SeparatorElement::Draw(BRect updateRect)
 	be_control_look->DrawLabel(this, Label(), frame, updateRect, base, flags,
 									BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER),
 									&textColor);
-}
-
-
-/* virtual */
-BSize
-SeparatorElement::MinSize()
-{
-	float width = 10;
-	float height = 20;
-	return BSize(width, height);
-}
-
-
-/* virtual */
-BSize
-SeparatorElement::MaxSize()
-{
-	float width = 10;
-	float height = 20;
-	return BSize(width, height);
 }
 
 
