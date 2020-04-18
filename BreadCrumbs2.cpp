@@ -179,8 +179,8 @@ BreadCrumbs2::MessageReceived(BMessage* message)
 				for (int32 i = 0; i < fPathComponents.CountStrings(); i++) {
 					BString pathComponent = fPathComponents.StringAt(i);
 					newPath.Append(pathComponent);
-					/*if (::strcmp(pathComponent.String(), sourceControl->Label()) == 0)
-						break;*/
+					if (::strcmp(pathComponent.String(), sourceControl->Label()) == 0)
+						break;
 				}
 				SetInitialPath(newPath);
 			}
