@@ -39,10 +39,10 @@ Window::Window(BRect rect)
 	BButton* button2 = new BButton("Toggle", new BMessage('TOGL'));
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.AddGlue()
-		.AddGroup(B_HORIZONTAL)
+		/*.AddGroup(B_HORIZONTAL)
 			.Add(view)
 			.Add(button)
-		.End()
+		.End()*/
 		.AddGroup(B_HORIZONTAL)
 			.Add(view2)
 			.Add(button2)
@@ -50,7 +50,7 @@ Window::Window(BRect rect)
 		.AddGlue()
 	.End();
 	
-	button->SetTarget(view);
+	//button->SetTarget(view);
 	button2->SetTarget(view2);
 }
 

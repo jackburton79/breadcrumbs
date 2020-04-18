@@ -76,7 +76,20 @@ public:
 	virtual BSize MaxSize();
 };
 
+class ContainerView : public BGroupView {
+public:
+	ContainerView();
+	virtual void Draw(BRect updateRect);
+	virtual void MouseDown(BPoint where);
 };
+
+class TextControl : public BTextControl {
+public:
+	TextControl(const char* name, const char* label, BMessage* message);
+	virtual void MakeFocus(bool focus);
+};
+
+}
 
 using namespace BC2;
 
@@ -113,7 +126,7 @@ BreadCrumbs2::SetInitialPath(BPath path)
 		path = parent;
 	}
 	
-	BGroupView* groupView = new BGroupView(B_HORIZONTAL, 0);
+	BGroupView* groupView = new ContainerView();
 	for (int32 i = 0; i < fPathComponents.CountStrings(); i++) {
 		Element* element = new Element(fPathComponents.StringAt(i));
 		groupView->AddChild(element);
@@ -121,7 +134,7 @@ BreadCrumbs2::SetInitialPath(BPath path)
 	}
 	groupView->GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
 	//groupView->SetInsets(4, 4, 4, 4);
-	fTextControl = new BTextControl("", fPath.Path(), new BMessage(kTextControlMessage));
+	fTextControl = new TextControl("", fPath.Path(), new BMessage(kTextControlMessage));
 	fTextControl->SetTarget(this, Window());
 
 	layout->AddView(groupView);
@@ -135,9 +148,10 @@ void
 BreadCrumbs2::Toggle()
 {
 	BCardLayout* layout = (BCardLayout*)GetLayout();
-	if (layout->VisibleIndex() == 0)
+	if (layout->VisibleIndex() == 0) {
 		layout->SetVisibleItem(1);
-	else
+		fTextControl->MakeFocus();
+	} else
 		layout->SetVisibleItem(0);
 }
 
@@ -540,4 +554,51 @@ RootElement::MaxSize()
 	float width = 20;
 	float height = 20;
 	return BSize(width, height);
+}
+
+
+// ContainerView
+ContainerView::ContainerView()
+	:
+	BGroupView(B_HORIZONTAL, 0)
+{
+	GroupLayout()->SetSpacing(2);
+	SetViewColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
+}
+
+
+/* virtual */
+void
+ContainerView::Draw(BRect updateRect)
+{
+	BGroupView::Draw(updateRect);
+	StrokeRect(Bounds());
+}
+
+
+/* virtual */
+void
+ContainerView::MouseDown(BPoint where)
+{
+	BGroupView::MouseDown(where);
+	BreadCrumbs2* view = dynamic_cast<BreadCrumbs2*>(Parent());
+	if (view != NULL) {
+		view->Toggle();
+	}
+}
+
+
+// TextView
+TextControl::TextControl(const char *name, const char* label, BMessage* message)
+	:
+	BTextControl(name, label, message)
+{
+}
+
+
+/* virtual */
+void
+TextControl::MakeFocus(bool focus)
+{
+	BTextControl::MakeFocus(false);
 }
