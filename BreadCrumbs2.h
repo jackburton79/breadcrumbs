@@ -26,10 +26,7 @@ public:
 	virtual BSize MinSize();
 	virtual BSize MaxSize();
 	virtual BSize PreferredSize();
-private:
-	void _DrawBackground(BRect updateRect);
-	void _DrawText(BRect updateRect);
-	
+private:	
 	BTextControl* fTextControl;
 	BStringList fPathComponents;
 	BPath fPath;

@@ -215,8 +215,6 @@ BreadCrumbs2::Draw(BRect updateRect)
 	be_control_look->DrawTextControlBorder(this, rect, updateRect,
 									base, be_control_look->Flags(this));
 		
-	_DrawBackground(updateRect);
-	_DrawText(updateRect);
 }
 
 
@@ -261,23 +259,6 @@ BSize
 BreadCrumbs2::PreferredSize()
 {
 	return MinSize();
-}
-
-
-void
-BreadCrumbs2::_DrawBackground(BRect updateRect)
-{
-	rgb_color base = LowColor();
-	rgb_color background = ViewColor();
-	uint32 flags = be_control_look->Flags(this);
-	BRect frame(Bounds());
-	//be_control_look->DrawButtonBackground(this, frame, updateRect, base, flags);
-}
-
-
-void
-BreadCrumbs2::_DrawText(BRect updateRect)
-{
 }
 
 
@@ -392,11 +373,12 @@ Element::MinSize()
 BSize
 Element::MaxSize()
 {
-	const float kPadding = 5;
-	float width = StringWidth(Label()) + kPadding;
+	const float kHorizontalPadding = 3;
+	const float kVerticalPadding = 4;
+	float width = StringWidth(Label()) + kHorizontalPadding;
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
-	float height = fontHeight.ascent + fontHeight.descent + kPadding;
+	float height = fontHeight.ascent + fontHeight.descent + kVerticalPadding;
 	return BSize(width, height);
 }
 
@@ -450,84 +432,12 @@ SeparatorElement::Draw(BRect updateRect)
 }
 
 
-// RootElement
-RootElement::RootElement()
-	:
-	Element("/")
-{
-}
-
-
-/* virtual */
-void
-RootElement::AttachedToWindow()
-{
-	BControl::AttachedToWindow();
-}
-
-
-/* virtual */
-void
-RootElement::SetValue(bool value)
-{
-}
-
-
-/* virtual */
-void
-RootElement::MouseDown(BPoint where)
-{
-	BControl::MouseDown(where);
-}
-
-
-/* virtual */
-void
-RootElement::Draw(BRect updateRect)
-{
-	BControl::Draw(updateRect);
-
-	rgb_color background = ViewColor();
-	rgb_color textColor = ui_color(B_CONTROL_TEXT_COLOR);
-	rgb_color base = LowColor();
-	BRect frame = Bounds();
-	uint32 flags = be_control_look->Flags(this);
-	be_control_look->DrawButtonFrame(this, frame, updateRect,
-									base, background, flags);
-	be_control_look->DrawButtonBackground(this, frame, updateRect, base, flags);
-	be_control_look->DrawLabel(this, Label(), frame, updateRect, base, flags,
-									BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER),
-									&textColor);
-}
-
-
-/* virtual */
-BSize
-RootElement::MinSize()
-{
-	float width = 20;
-	float height = 20;
-	return BSize(width, height);
-}
-
-
-/* virtual */
-BSize
-RootElement::MaxSize()
-{
-	const float kPadding = 20;
-	float width = 20;
-	float height = 20;
-	return BSize(width, height);
-}
-
-
 // ContainerView
 ContainerView::ContainerView()
 	:
 	BGroupView(B_HORIZONTAL, 0)
 {
-	GroupLayout()->SetSpacing(2);
+	//GroupLayout()->SetSpacing(2);
 	SetViewColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
 }
 
@@ -553,8 +463,8 @@ ContainerView::MouseDown(BPoint where)
 }
 
 
-// TextView
-TextControl::TextControl(const char *name, const char* label, BMessage* message)
+// TextControl
+TextControl::TextControl(const char* name, const char* label, BMessage* message)
 	:
 	BTextControl(name, label, message)
 {
@@ -574,10 +484,10 @@ void
 TextControl::KeyDown(const char* bytes, int32 numBytes)
 {
 	switch (bytes[0]) {
-		case B_ESCAPE:
+		/*case B_ESCAPE:
 		{
 			break;
-		}
+		}*/
 		default:
 			BTextControl::KeyDown(bytes, numBytes);
 			break;
