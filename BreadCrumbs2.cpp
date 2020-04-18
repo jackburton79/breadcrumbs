@@ -603,7 +603,7 @@ TextControl::TextControl(const char *name, const char* label, BMessage* message)
 void
 TextControl::MakeFocus(bool focus)
 {
-	BTextControl::MakeFocus(false);
+	BTextControl::MakeFocus(focus);
 }
 
 
