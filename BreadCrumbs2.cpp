@@ -59,20 +59,6 @@ public:
 };
 
 
-class RootElement : public Element {
-public:
-	RootElement();
-	virtual void SetValue(bool value);
-	
-	virtual void AttachedToWindow();
-	virtual void MouseDown(BPoint where);
-	
-	virtual void Draw(BRect rect);
-	
-	virtual BSize MinSize();
-	virtual BSize MaxSize();
-};
-
 class ContainerView : public BGroupView {
 public:
 	ContainerView();
