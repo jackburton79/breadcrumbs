@@ -92,6 +92,7 @@ BreadCrumbs2::BreadCrumbs2(BPath path)
 void
 BreadCrumbs2::SetInitialPath(BPath path)
 {
+	std::cout << "SetInitialPath()" << std::endl;
 	fPath = path;
 	BLayout* layout = GetLayout();
 
@@ -119,6 +120,7 @@ BreadCrumbs2::SetInitialPath(BPath path)
 	groupView->GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
 
 	fTextControl = new TextControl("", fPath.Path(), new BMessage(kTextControlMessage));
+	//fTextControl->SetModificationMessage(new BMessage(kTextControlMessage));
 	fTextControl->SetTarget(this, Window());
 
 	layout->AddView(groupView);
@@ -135,8 +137,22 @@ BreadCrumbs2::Toggle()
 	if (layout->VisibleIndex() == 0) {
 		layout->SetVisibleItem(1);
 		fTextControl->MakeFocus();
-	} else
+		// the TextInput inside the BTextControl catches B_ENTER, and does
+		// not send a message if the content hasn't changed, so we need to catch it
+		// in another way. Thus we receive all keyboard events
+		SetEventMask(B_KEYBOARD_EVENTS, 0);
+	} else {
+		SetEventMask(0, 0);
 		layout->SetVisibleItem(0);
+	}
+}
+
+
+bool
+BreadCrumbs2::TextControlShown() const
+{
+	BCardLayout* layout = (BCardLayout*)GetLayout();
+	return layout->VisibleIndex() == 0;
 }
 
 
@@ -171,6 +187,7 @@ BreadCrumbs2::MessageReceived(BMessage* message)
 		}
 		case kTextControlMessage:
 		{
+			std::cout << "TextControlMessage" << std::endl;
 			BPath newPath = fTextControl->Text();
 			if (BEntry(newPath.Path()).Exists()) {
 				SetInitialPath(newPath);
@@ -211,7 +228,29 @@ BreadCrumbs2::MouseDown(BPoint where)
 	BControl::MouseDown(where);
 }
 
-		
+
+/* virtual */
+void
+BreadCrumbs2::KeyDown(const char* bytes, int32 numBytes)
+{
+	switch (bytes[0]) {
+		case B_ENTER:
+		case B_ESCAPE:
+		{
+			BPath newPath = fTextControl->Text();
+			if (BEntry(newPath.Path()).Exists()) {
+				SetInitialPath(newPath);
+			} else {
+				fTextControl->SetText(fPath.Path());
+			}
+		}
+		default:
+			BControl::KeyDown(bytes, numBytes);
+			break;
+	}
+}
+
+
 /* virtual */
 BSize
 BreadCrumbs2::MinSize()

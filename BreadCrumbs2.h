@@ -17,11 +17,14 @@ public:
 	BreadCrumbs2(BPath path);
 	void SetInitialPath(BPath path);
 	void Toggle();
+
+	bool TextControlShown() const;
 	
 	virtual void AllAttached();
 	virtual void MessageReceived(BMessage* message);
 	virtual void Draw(BRect updateRect);
 	virtual void MouseDown(BPoint where);
+	virtual void KeyDown(const char* bytes, int32 numBytes);
 
 	virtual BSize MinSize();
 	virtual BSize MaxSize();
