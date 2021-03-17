@@ -92,7 +92,6 @@ BreadCrumbs2::BreadCrumbs2(BPath path)
 void
 BreadCrumbs2::SetInitialPath(BPath path)
 {
-	std::cout << "SetInitialPath()" << std::endl;
 	fPath = path;
 	BLayout* layout = GetLayout();
 
@@ -187,7 +186,6 @@ BreadCrumbs2::MessageReceived(BMessage* message)
 		}
 		case kTextControlMessage:
 		{
-			std::cout << "TextControlMessage" << std::endl;
 			BPath newPath = fTextControl->Text();
 			if (BEntry(newPath.Path()).Exists()) {
 				SetInitialPath(newPath);
