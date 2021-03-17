@@ -8,6 +8,7 @@
 
 #include <Button.h>
 #include <ControlLook.h>
+#include <Directory.h>
 #include <Entry.h>
 #include <GroupLayoutBuilder.h>
 #include <LayoutBuilder.h>
@@ -66,13 +67,6 @@ public:
 	virtual void MouseDown(BPoint where);
 };
 
-class TextControl : public BTextControl {
-public:
-	TextControl(const char* name, const char* label, BMessage* message);
-	virtual void KeyDown(const char* bytes, int32 numBytes);
-	virtual void MakeFocus(bool focus);
-};
-
 }
 
 using namespace BC2;
@@ -81,6 +75,7 @@ BreadCrumbs2::BreadCrumbs2(BPath path)
 	:
 	BControl("breadcrumbs", "breadcrumbs", new BMessage(), B_WILL_DRAW),
 	fTextControl(NULL),
+	fTextControlHint(NULL),
 	fPath(path)
 {
 	SetLayout(new BCardLayout());
@@ -98,8 +93,8 @@ BreadCrumbs2::SetInitialPath(BPath path)
 	// Remove existing views
 	if (fPathComponents.CountStrings() > 0) {
 		fPathComponents.MakeEmpty();
-		layout->RemoveView(ChildAt(0));
-		layout->RemoveView(fTextControl);
+		while (layout->CountItems())
+			layout->RemoveView(ChildAt(0));
 	}
 
 	// Split path and create elements
@@ -118,12 +113,20 @@ BreadCrumbs2::SetInitialPath(BPath path)
 	}
 	groupView->GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
 
-	fTextControl = new TextControl("", fPath.Path(), new BMessage(kTextControlMessage));
-	//fTextControl->SetModificationMessage(new BMessage(kTextControlMessage));
+	fTextControl = new BTextControl("", fPath.Path(), new BMessage(kTextControlMessage));
+	fTextControlHint = new BTextControl("", fPath.Path(), new BMessage());
 	fTextControl->SetTarget(this, Window());
 
+	BView* view = BLayoutBuilder::Group<>(B_VERTICAL)
+		.AddGroup(B_VERTICAL)
+		.SetInsets(B_USE_DEFAULT_SPACING, 0, B_USE_DEFAULT_SPACING, 0)
+			.Add(fTextControl)
+			.Add(fTextControlHint)
+		.End()
+		.View();
+		
 	layout->AddView(groupView);
-	layout->AddView(fTextControl);
+	layout->AddView(view);
 
 	((BCardLayout*)layout)->SetVisibleItem(0);
 }
@@ -152,6 +155,30 @@ BreadCrumbs2::TextControlShown() const
 {
 	BCardLayout* layout = (BCardLayout*)GetLayout();
 	return layout->VisibleIndex() == 0;
+}
+
+
+void
+BreadCrumbs2::RetrievePathHint(const BString& current, const BString& newText)
+{
+	BString leaf = BPath(newText).Leaf();
+	if (BEntry(newText).Exists()) {
+		fTextControlHint->SetText(fPath.Path());
+		return;
+	}
+	std::cout << current << ", " << leaf << std::endl;
+	BPath currentPath = fPath;
+	BEntry entry;
+	BDirectory directory(fPath.Path());
+	while (directory.GetNextEntry(&entry) == B_OK) {
+		if (BString(entry.Name()).StartsWith(leaf)) {
+			BPath newPathHint = fPath;
+			newPathHint.Append(entry.Name());
+			std::cout << newPathHint.Path() << std::endl;
+			fTextControlHint->SetText(newPathHint.Path());
+			break;
+		}
+	}
 }
 
 
@@ -186,6 +213,7 @@ BreadCrumbs2::MessageReceived(BMessage* message)
 		}
 		case kTextControlMessage:
 		{
+			message->PrintToStream();
 			BPath newPath = fTextControl->Text();
 			if (BEntry(newPath.Path()).Exists()) {
 				SetInitialPath(newPath);
@@ -243,8 +271,13 @@ BreadCrumbs2::KeyDown(const char* bytes, int32 numBytes)
 			}
 		}
 		default:
+		{
 			BControl::KeyDown(bytes, numBytes);
+			std::cout << fTextControl->Text() << std::endl;
+			std::cout << bytes << std::endl;
+			RetrievePathHint(fPath.Path(), fTextControl->Text());
 			break;
+		}
 	}
 }
 
@@ -262,7 +295,7 @@ BSize
 BreadCrumbs2::MaxSize()
 {
 	float maxWidth = 400;
-	float maxHeight = 25;
+	float maxHeight = 60;
 	/*BLayout* layout = GetLayout();
 	for (int32 i = 0; i < layout->CountItems(); i++) {
 		BLayoutItem* item = layout->ItemAt(i);
@@ -482,37 +515,5 @@ ContainerView::MouseDown(BPoint where)
 	BreadCrumbs2* view = dynamic_cast<BreadCrumbs2*>(Parent());
 	if (view != NULL) {
 		view->Toggle();
-	}
-}
-
-
-// TextControl
-TextControl::TextControl(const char* name, const char* label, BMessage* message)
-	:
-	BTextControl(name, label, message)
-{
-}
-
-
-/* virtual */
-void
-TextControl::MakeFocus(bool focus)
-{
-	BTextControl::MakeFocus(focus);
-}
-
-
-/* virtual */
-void
-TextControl::KeyDown(const char* bytes, int32 numBytes)
-{
-	switch (bytes[0]) {
-		/*case B_ESCAPE:
-		{
-			break;
-		}*/
-		default:
-			BTextControl::KeyDown(bytes, numBytes);
-			break;
 	}
 }

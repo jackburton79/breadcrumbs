@@ -20,6 +20,8 @@ public:
 
 	bool TextControlShown() const;
 	
+	void RetrievePathHint(const BString& current, const BString& newText);
+
 	virtual void AllAttached();
 	virtual void MessageReceived(BMessage* message);
 	virtual void Draw(BRect updateRect);
@@ -31,6 +33,7 @@ public:
 	virtual BSize PreferredSize();
 private:	
 	BTextControl* fTextControl;
+	BTextControl* fTextControlHint;
 	BStringList fPathComponents;
 	BPath fPath;
 };
