@@ -26,6 +26,9 @@ using BPrivate::BControlLook;
 
 namespace BC2 {
 
+const float kHorizontalPadding = 3;
+const float kVerticalPadding = 4;
+
 class Element : public BControl {
 public:
 	Element(BString string);
@@ -221,6 +224,16 @@ BreadCrumbs::MessageReceived(BMessage* message)
 		case 'TOGL':
 		{
 			Toggle();
+			break;
+		}
+		case B_KEY_DOWN:
+		{
+			int8 byte;
+			if (message->FindInt8("byte", &byte) == B_OK
+				&& byte == B_TAB) {
+				SetInitialPath(fPathHint.Path());
+			}
+			BControl::MessageReceived(message);
 			break;
 		}
 		case B_KEY_UP:
@@ -447,8 +460,6 @@ Element::MinSize()
 BSize
 Element::MaxSize()
 {
-	const float kHorizontalPadding = 3;
-	const float kVerticalPadding = 4;
 	float width = StringWidth(Label()) + kHorizontalPadding;
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
