@@ -167,16 +167,15 @@ BreadCrumbs2::RetrievePathHint(const BString& current, const BString& newText)
 	BPath currentPath = parent;
 	BEntry entry;
 	BDirectory directory(currentPath.Path());
+	BPath newPathHint = "";
 	while (directory.GetNextEntry(&entry) == B_OK) {
 		if (entry.IsDirectory() && BString(entry.Name()).StartsWith(leaf)) {
-			BPath newPathHint = currentPath;
+			newPathHint = currentPath;
 			newPathHint.Append(entry.Name());
-			fPathHint = newPathHint;
 			break;
 		}
 	}
-	
-	std::cout << "path hint: " << fPathHint.Path() << std::endl;
+	fPathHint = newPathHint;
 }
 
 
@@ -211,7 +210,6 @@ BreadCrumbs2::MessageReceived(BMessage* message)
 		}
 		case kTextControlMessage:
 		{
-			message->PrintToStream();
 			BPath newPath = fTextControl->Text();
 			if (BEntry(newPath.Path()).Exists()) {
 				SetInitialPath(newPath);
