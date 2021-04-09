@@ -162,17 +162,15 @@ void
 BreadCrumbs2::RetrievePathHint(const BString& current, const BString& newText)
 {
 	BString leaf = BPath(newText).Leaf();
-	if (BEntry(newText).Exists()) {
-		fTextControlHint->SetText(fPath.Path());
-		return;
-	}
-	std::cout << current << ", " << leaf << std::endl;
-	BPath currentPath = fPath;
+	BPath parent(newText);
+	parent.GetParent(&parent);
+
+	BPath currentPath = parent;
 	BEntry entry;
-	BDirectory directory(fPath.Path());
+	BDirectory directory(currentPath.Path());
 	while (directory.GetNextEntry(&entry) == B_OK) {
-		if (BString(entry.Name()).StartsWith(leaf)) {
-			BPath newPathHint = fPath;
+		if (entry.IsDirectory() && BString(entry.Name()).StartsWith(leaf)) {
+			BPath newPathHint = currentPath;
 			newPathHint.Append(entry.Name());
 			std::cout << newPathHint.Path() << std::endl;
 			fTextControlHint->SetText(newPathHint.Path());
@@ -227,6 +225,10 @@ BreadCrumbs2::MessageReceived(BMessage* message)
 			Toggle();
 			break;
 		}
+		case B_KEY_UP:
+			RetrievePathHint(fPath.Path(), fTextControl->Text());
+			BControl::MessageReceived(message);
+			break;
 		default:
 			BControl::MessageReceived(message);
 			break;
@@ -273,9 +275,6 @@ BreadCrumbs2::KeyDown(const char* bytes, int32 numBytes)
 		default:
 		{
 			BControl::KeyDown(bytes, numBytes);
-			std::cout << fTextControl->Text() << std::endl;
-			std::cout << bytes << std::endl;
-			RetrievePathHint(fPath.Path(), fTextControl->Text());
 			break;
 		}
 	}
