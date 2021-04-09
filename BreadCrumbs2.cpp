@@ -172,7 +172,6 @@ BreadCrumbs2::RetrievePathHint(const BString& current, const BString& newText)
 		if (entry.IsDirectory() && BString(entry.Name()).StartsWith(leaf)) {
 			BPath newPathHint = currentPath;
 			newPathHint.Append(entry.Name());
-			std::cout << newPathHint.Path() << std::endl;
 			fTextControlHint->SetText(newPathHint.Path());
 			break;
 		}
