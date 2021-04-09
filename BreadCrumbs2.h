@@ -25,6 +25,7 @@ public:
 	virtual void AllAttached();
 	virtual void MessageReceived(BMessage* message);
 	virtual void Draw(BRect updateRect);
+	virtual	void DrawAfterChildren(BRect updateRect);
 	virtual void MouseDown(BPoint where);
 	virtual void KeyDown(const char* bytes, int32 numBytes);
 
@@ -33,9 +34,9 @@ public:
 	virtual BSize PreferredSize();
 private:	
 	BTextControl* fTextControl;
-	BTextControl* fTextControlHint;
 	BStringList fPathComponents;
 	BPath fPath;
+	BPath fPathHint;
 };
 
 

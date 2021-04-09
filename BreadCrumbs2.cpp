@@ -73,10 +73,10 @@ using namespace BC2;
 
 BreadCrumbs2::BreadCrumbs2(BPath path)
 	:
-	BControl("breadcrumbs", "breadcrumbs", new BMessage(), B_WILL_DRAW),
+	BControl("breadcrumbs", "breadcrumbs", new BMessage(), B_WILL_DRAW|B_DRAW_ON_CHILDREN),
 	fTextControl(NULL),
-	fTextControlHint(NULL),
-	fPath(path)
+	fPath(path),
+	fPathHint("")
 {
 	SetLayout(new BCardLayout());
 	SetViewColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
@@ -88,6 +88,7 @@ void
 BreadCrumbs2::SetInitialPath(BPath path)
 {
 	fPath = path;
+	fPathHint = "";
 	BLayout* layout = GetLayout();
 
 	// Remove existing views
@@ -114,14 +115,12 @@ BreadCrumbs2::SetInitialPath(BPath path)
 	groupView->GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
 
 	fTextControl = new BTextControl("", fPath.Path(), new BMessage(kTextControlMessage));
-	fTextControlHint = new BTextControl("", fPath.Path(), new BMessage());
 	fTextControl->SetTarget(this, Window());
 
 	BView* view = BLayoutBuilder::Group<>(B_VERTICAL)
 		.AddGroup(B_VERTICAL)
 		.SetInsets(B_USE_DEFAULT_SPACING, 0, B_USE_DEFAULT_SPACING, 0)
 			.Add(fTextControl)
-			.Add(fTextControlHint)
 		.End()
 		.View();
 		
@@ -172,10 +171,12 @@ BreadCrumbs2::RetrievePathHint(const BString& current, const BString& newText)
 		if (entry.IsDirectory() && BString(entry.Name()).StartsWith(leaf)) {
 			BPath newPathHint = currentPath;
 			newPathHint.Append(entry.Name());
-			fTextControlHint->SetText(newPathHint.Path());
+			fPathHint = newPathHint;
 			break;
 		}
 	}
+	
+	std::cout << "path hint: " << fPathHint.Path() << std::endl;
 }
 
 
@@ -226,6 +227,7 @@ BreadCrumbs2::MessageReceived(BMessage* message)
 		}
 		case B_KEY_UP:
 			RetrievePathHint(fPath.Path(), fTextControl->Text());
+			Invalidate();
 			BControl::MessageReceived(message);
 			break;
 		default:
@@ -245,6 +247,25 @@ BreadCrumbs2::Draw(BRect updateRect)
 	be_control_look->DrawTextControlBorder(this, rect, updateRect,
 									base, be_control_look->Flags(this));
 		
+}
+
+
+/* virtual */
+void
+BreadCrumbs2::DrawAfterChildren(BRect updateRect)
+{
+	if (!TextControlShown()) {
+		float textWidth = fTextControl->StringWidth(fTextControl->Text());
+		BString hintLeaf = fPathHint.Leaf();
+		BString pathLeaf = BPath(fTextControl->Text()).Leaf();
+		float leafWidth = fTextControl->StringWidth(pathLeaf);
+		MovePenTo(textWidth - leafWidth + 15, 35);
+		if (hintLeaf != pathLeaf) {
+			SetHighColor(tint_color(HighColor(), B_LIGHTEN_2_TINT));
+			DrawString(hintLeaf);
+		}
+	}
+	BControl::DrawAfterChildren(updateRect);
 }
 
 
