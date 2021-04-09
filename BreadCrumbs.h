@@ -2,8 +2,8 @@
  * Copyright 2020, Stefano Ceccherini <stefano.ceccherini@gmail.com>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
-#ifndef _BREADCRUMBS2_H
-#define _BREADCRUMBS2_H
+#ifndef _BREADCRUMBS_H
+#define _BREADCRUMBS_H
 
 
 #include <Control.h>
@@ -12,9 +12,9 @@
 #include <StringList.h>
 
 class BTextControl;
-class BreadCrumbs2 : public BControl {
+class BreadCrumbs : public BControl {
 public:
-	BreadCrumbs2(BPath path);
+	BreadCrumbs(BPath path);
 	void SetInitialPath(BPath path);
 	void Toggle();
 

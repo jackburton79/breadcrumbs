@@ -4,7 +4,7 @@
  */
 
 
-#include "BreadCrumbs2.h"
+#include "BreadCrumbs.h"
 
 #include <Button.h>
 #include <ControlLook.h>
@@ -71,7 +71,7 @@ public:
 
 using namespace BC2;
 
-BreadCrumbs2::BreadCrumbs2(BPath path)
+BreadCrumbs::BreadCrumbs(BPath path)
 	:
 	BControl("breadcrumbs", "breadcrumbs", new BMessage(), B_WILL_DRAW|B_DRAW_ON_CHILDREN),
 	fTextControl(NULL),
@@ -85,7 +85,7 @@ BreadCrumbs2::BreadCrumbs2(BPath path)
 
 
 void
-BreadCrumbs2::SetInitialPath(BPath path)
+BreadCrumbs::SetInitialPath(BPath path)
 {
 	fPath = path;
 	fPathHint = "";
@@ -132,7 +132,7 @@ BreadCrumbs2::SetInitialPath(BPath path)
 
 
 void
-BreadCrumbs2::Toggle()
+BreadCrumbs::Toggle()
 {
 	BCardLayout* layout = (BCardLayout*)GetLayout();
 	if (layout->VisibleIndex() == 0) {
@@ -150,7 +150,7 @@ BreadCrumbs2::Toggle()
 
 
 bool
-BreadCrumbs2::TextControlShown() const
+BreadCrumbs::TextControlShown() const
 {
 	BCardLayout* layout = (BCardLayout*)GetLayout();
 	return layout->VisibleIndex() == 0;
@@ -158,7 +158,7 @@ BreadCrumbs2::TextControlShown() const
 
 
 void
-BreadCrumbs2::RetrievePathHint(const BString& current, const BString& newText)
+BreadCrumbs::RetrievePathHint(const BString& current, const BString& newText)
 {
 	BString leaf = BPath(newText).Leaf();
 	BPath parent(newText);
@@ -181,7 +181,7 @@ BreadCrumbs2::RetrievePathHint(const BString& current, const BString& newText)
 
 /* virtual */
 void
-BreadCrumbs2::AllAttached()
+BreadCrumbs::AllAttached()
 {
 	BView::AllAttached();
 	fTextControl->SetTarget(this, Window());
@@ -190,7 +190,7 @@ BreadCrumbs2::AllAttached()
 
 /* virtual */
 void
-BreadCrumbs2::MessageReceived(BMessage* message)
+BreadCrumbs::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMessageCode:
@@ -237,7 +237,7 @@ BreadCrumbs2::MessageReceived(BMessage* message)
 
 /* virtual */
 void
-BreadCrumbs2::Draw(BRect updateRect)
+BreadCrumbs::Draw(BRect updateRect)
 {
 	BControl::Draw(updateRect);
 	BRect rect(Bounds());
@@ -250,7 +250,7 @@ BreadCrumbs2::Draw(BRect updateRect)
 
 /* virtual */
 void
-BreadCrumbs2::DrawAfterChildren(BRect updateRect)
+BreadCrumbs::DrawAfterChildren(BRect updateRect)
 {
 	if (!TextControlShown()) {
 		float textWidth = fTextControl->StringWidth(fTextControl->Text());
@@ -269,7 +269,7 @@ BreadCrumbs2::DrawAfterChildren(BRect updateRect)
 
 /* virtual */
 void
-BreadCrumbs2::MouseDown(BPoint where)
+BreadCrumbs::MouseDown(BPoint where)
 {
 	BControl::MouseDown(where);
 }
@@ -277,7 +277,7 @@ BreadCrumbs2::MouseDown(BPoint where)
 
 /* virtual */
 void
-BreadCrumbs2::KeyDown(const char* bytes, int32 numBytes)
+BreadCrumbs::KeyDown(const char* bytes, int32 numBytes)
 {
 	switch (bytes[0]) {
 		case B_ENTER:
@@ -301,7 +301,7 @@ BreadCrumbs2::KeyDown(const char* bytes, int32 numBytes)
 
 /* virtual */
 BSize
-BreadCrumbs2::MinSize()
+BreadCrumbs::MinSize()
 {
 	return MaxSize();
 }
@@ -309,7 +309,7 @@ BreadCrumbs2::MinSize()
 
 /* virtual */
 BSize
-BreadCrumbs2::MaxSize()
+BreadCrumbs::MaxSize()
 {
 	float maxWidth = 400;
 	float maxHeight = 60;
@@ -329,7 +329,7 @@ BreadCrumbs2::MaxSize()
 
 /* virtual */
 BSize
-BreadCrumbs2::PreferredSize()
+BreadCrumbs::PreferredSize()
 {
 	return MinSize();
 }
@@ -529,7 +529,7 @@ void
 ContainerView::MouseDown(BPoint where)
 {
 	BGroupView::MouseDown(where);
-	BreadCrumbs2* view = dynamic_cast<BreadCrumbs2*>(Parent());
+	BreadCrumbs* view = dynamic_cast<BreadCrumbs*>(Parent());
 	if (view != NULL) {
 		view->Toggle();
 	}

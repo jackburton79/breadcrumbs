@@ -25,7 +25,6 @@ APP_MIME_SIG =
 #%{
 SRCS = \
 	 BreadCrumbs.cpp  \
-	 BreadCrumbs2.cpp  \
 	 main.cpp  \
 
 
@@ -41,6 +40,8 @@ RSRCS = \
 
 # End Pe/Eddie support.
 # @<-src@
+#%}
+
 #%}
 
 #%}

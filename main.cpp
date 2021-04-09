@@ -5,7 +5,6 @@
 
 
 #include "BreadCrumbs.h"
-#include "BreadCrumbs2.h"
 
 #include <Application.h>
 #include <Box.h>
@@ -35,7 +34,7 @@ Window::Window(BRect rect)
 {
 	BPath path("/boot/home/config/settings");
 	BBox* box = new BBox("Breadcrumbs");
-	BView* view2 = new BreadCrumbs2(path);
+	BView* view2 = new BreadCrumbs(path);
 	box->AddChild(view2);
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.AddGlue()
