@@ -257,7 +257,7 @@ BreadCrumbs::DrawAfterChildren(BRect updateRect)
 		BString hintLeaf = fPathHint.Leaf();
 		BString pathLeaf = BPath(fTextControl->Text()).Leaf();
 		float leafWidth = fTextControl->StringWidth(pathLeaf);
-		MovePenTo(textWidth - leafWidth + 15, 35);
+		MovePenTo(textWidth - leafWidth + 15, 5 + Bounds().Height() / 2);
 		if (hintLeaf != pathLeaf) {
 			SetHighColor(tint_color(HighColor(), B_LIGHTEN_2_TINT));
 			DrawString(hintLeaf);
@@ -312,7 +312,7 @@ BSize
 BreadCrumbs::MaxSize()
 {
 	float maxWidth = 400;
-	float maxHeight = 60;
+	float maxHeight = 30;
 	/*BLayout* layout = GetLayout();
 	for (int32 i = 0; i < layout->CountItems(); i++) {
 		BLayoutItem* item = layout->ItemAt(i);
