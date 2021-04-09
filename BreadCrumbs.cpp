@@ -342,6 +342,7 @@ Element::Element(BString string)
 {
 	SetHovering(false);
 	fHoveringLevel = 0;
+	SetViewColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
 }
 
 
