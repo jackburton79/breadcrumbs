@@ -14,8 +14,10 @@
 class BTextControl;
 class BreadCrumbs : public BControl {
 public:
-	BreadCrumbs(BPath path);
-	void SetInitialPath(BPath path);
+	BreadCrumbs(const BPath& path);
+	void SetLocation(const BPath& location);
+	BPath Location() const;
+
 	void Toggle();
 
 	bool TextControlShown() const;

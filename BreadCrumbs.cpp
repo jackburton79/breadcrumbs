@@ -74,7 +74,7 @@ public:
 
 using namespace BC2;
 
-BreadCrumbs::BreadCrumbs(BPath path)
+BreadCrumbs::BreadCrumbs(const BPath& path)
 	:
 	BControl("breadcrumbs", "breadcrumbs", new BMessage(), B_WILL_DRAW|B_DRAW_ON_CHILDREN),
 	fTextControl(NULL),
@@ -83,17 +83,25 @@ BreadCrumbs::BreadCrumbs(BPath path)
 {
 	SetLayout(new BCardLayout());
 	SetViewColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
-	SetInitialPath(path);
+	SetLocation(path);
+}
+
+
+BPath
+BreadCrumbs::Location() const
+{
+	return fPath;
 }
 
 
 void
-BreadCrumbs::SetInitialPath(BPath path)
+BreadCrumbs::SetLocation(const BPath& path)
 {
 	fPath = path;
 	fPathHint = "";
 	BLayout* layout = GetLayout();
 
+	BPath tempPath = path;
 	// Remove existing views
 	if (fPathComponents.CountStrings() > 0) {
 		fPathComponents.MakeEmpty();
@@ -103,10 +111,10 @@ BreadCrumbs::SetInitialPath(BPath path)
 
 	// Split path and create elements
 	BPath parent;
-	while (path.GetParent(&parent) == B_OK) {
-		BString pathComponent = path.Leaf();
+	while (tempPath.GetParent(&parent) == B_OK) {
+		BString pathComponent = tempPath.Leaf();
 		fPathComponents.Add(pathComponent, 0);
-		path = parent;
+		tempPath = parent;
 	}
 	
 	BGroupView* groupView = new ContainerView();
@@ -207,7 +215,7 @@ BreadCrumbs::MessageReceived(BMessage* message)
 					if (::strcmp(pathComponent.String(), sourceControl->Label()) == 0)
 						break;
 				}
-				SetInitialPath(newPath);
+				SetLocation(newPath);
 			}
 			break;
 		}
@@ -215,7 +223,7 @@ BreadCrumbs::MessageReceived(BMessage* message)
 		{
 			BPath newPath = fTextControl->Text();
 			if (BEntry(newPath.Path()).Exists()) {
-				SetInitialPath(newPath);
+				SetLocation(newPath);
 			} else {
 				fTextControl->SetText(fPath.Path());
 			}
@@ -231,7 +239,7 @@ BreadCrumbs::MessageReceived(BMessage* message)
 			int8 byte;
 			if (message->FindInt8("byte", &byte) == B_OK
 				&& byte == B_TAB) {
-				SetInitialPath(fPathHint.Path());
+				SetLocation(fPathHint.Path());
 			}
 			BControl::MessageReceived(message);
 			break;
@@ -298,7 +306,7 @@ BreadCrumbs::KeyDown(const char* bytes, int32 numBytes)
 		{
 			BPath newPath = fTextControl->Text();
 			if (BEntry(newPath.Path()).Exists()) {
-				SetInitialPath(newPath);
+				SetLocation(newPath);
 			} else {
 				fTextControl->SetText(fPath.Path());
 			}
