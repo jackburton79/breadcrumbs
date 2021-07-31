@@ -21,8 +21,6 @@ public:
 	void Toggle();
 
 	bool TextControlShown() const;
-	
-	void RetrievePathHint(const BString& current, const BString& newText);
 
 	virtual void AllAttached();
 	virtual void MessageReceived(BMessage* message);
@@ -34,7 +32,10 @@ public:
 	virtual BSize MinSize();
 	virtual BSize MaxSize();
 	virtual BSize PreferredSize();
-private:	
+
+private:
+	void RetrievePathHint(const BString& current, const BString& newText);
+
 	BTextControl* fTextControl;
 	BStringList fPathComponents;
 	BPath fPath;
