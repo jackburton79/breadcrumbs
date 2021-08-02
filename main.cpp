@@ -34,7 +34,7 @@ Window::Window(BRect rect)
 {
 	BPath path("/boot/home/config/settings");
 	BBox* box = new BBox("Breadcrumbs");
-	BView* view2 = new BreadCrumbs("breadcrumbs", path, new BMessage('TOKK');
+	BView* view2 = new BreadCrumbs("breadcrumbs", path, new BMessage('TOKK'));
 	box->AddChild(view2);
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.AddGlue()
