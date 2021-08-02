@@ -241,9 +241,10 @@ BreadCrumbs::MessageReceived(BMessage* message)
 			int8 byte;
 			if (message->FindInt8("byte", &byte) == B_OK
 				&& byte == B_TAB) {
-				SetLocation(fPathHint.Path());
-			}
-			BControl::MessageReceived(message);
+				fTextControl->SetText(fPathHint.Path());
+				// eat B_TAB
+			} else
+				BControl::MessageReceived(message);
 			break;
 		}
 		case B_KEY_UP:
