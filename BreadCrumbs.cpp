@@ -32,7 +32,7 @@ const float kVerticalPadding = 4;
 class Element : public BControl {
 public:
 	Element(BString string);
-	virtual void SetValue(bool value);
+	virtual void SetValue(int32 value);
 
 	virtual void AttachedToWindow();
 	virtual void MouseDown(BPoint where);
@@ -54,7 +54,7 @@ private:
 class SeparatorElement : public Element {
 public:
 	SeparatorElement();
-	virtual void SetValue(bool value);
+	virtual void SetValue(int32 value);
 	
 	virtual void AttachedToWindow();
 	virtual void MouseDown(BPoint where);
@@ -377,7 +377,7 @@ Element::AttachedToWindow()
 
 /* virtual */
 void
-Element::SetValue(bool value)
+Element::SetValue(int32 value)
 {
 	if (value != Value()) {
 		SetValueNoUpdate(value);
@@ -494,7 +494,7 @@ SeparatorElement::AttachedToWindow()
 
 /* virtual */
 void
-SeparatorElement::SetValue(bool value)
+SeparatorElement::SetValue(int32 value)
 {
 	// Empty
 }
@@ -514,7 +514,6 @@ SeparatorElement::Draw(BRect updateRect)
 {
 	BControl::Draw(updateRect);
 	
-	rgb_color background = ViewColor();
 	rgb_color textColor = ui_color(B_CONTROL_TEXT_COLOR);
 	rgb_color base = LowColor();
 	BRect frame = Bounds();
