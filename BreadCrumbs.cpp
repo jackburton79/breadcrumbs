@@ -74,9 +74,9 @@ public:
 
 using namespace BC2;
 
-BreadCrumbs::BreadCrumbs(const BPath& path)
+BreadCrumbs::BreadCrumbs(const char* name, const BPath& path, BMessage* message)
 	:
-	BControl("breadcrumbs", "breadcrumbs", new BMessage(), B_WILL_DRAW|B_DRAW_ON_CHILDREN),
+	BControl("breadcrumbs", "breadcrumbs", message, B_WILL_DRAW|B_DRAW_ON_CHILDREN),
 	fTextControl(NULL),
 	fPath(path),
 	fPathHint("")
@@ -216,6 +216,7 @@ BreadCrumbs::MessageReceived(BMessage* message)
 						break;
 				}
 				SetLocation(newPath);
+				Invoke();
 			}
 			break;
 		}
@@ -224,6 +225,7 @@ BreadCrumbs::MessageReceived(BMessage* message)
 			BPath newPath = fTextControl->Text();
 			if (BEntry(newPath.Path()).Exists()) {
 				SetLocation(newPath);
+				Invoke();
 			} else {
 				fTextControl->SetText(fPath.Path());
 			}

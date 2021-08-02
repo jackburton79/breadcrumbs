@@ -14,7 +14,7 @@
 class BTextControl;
 class BreadCrumbs : public BControl {
 public:
-	BreadCrumbs(const BPath& path);
+	BreadCrumbs(const char* name, const BPath& path, BMessage* message);
 	void SetLocation(const BPath& location);
 	BPath Location() const;
 
