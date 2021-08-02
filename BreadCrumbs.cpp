@@ -76,7 +76,7 @@ using namespace BC2;
 
 BreadCrumbs::BreadCrumbs(const char* name, const BPath& path, BMessage* message)
 	:
-	BControl("breadcrumbs", "breadcrumbs", message, B_WILL_DRAW|B_DRAW_ON_CHILDREN),
+	BControl(name, name, message, B_WILL_DRAW|B_DRAW_ON_CHILDREN),
 	fTextControl(NULL),
 	fPath(path),
 	fPathHint("")
